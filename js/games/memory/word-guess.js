@@ -98,10 +98,16 @@ export default class WordGuessGame extends Game {
         this.targetWord = this.WORDS[Math.floor(Math.random() * this.WORDS.length)];
         this.hintAvailable = true;
         this.hintCooldown = 0;
+
+        // Score Tracking
+        this.score = 0;
+        this.solvedIndices = new Set();
+        this.updateScore(0);
+
         if (this.hintTimer) clearInterval(this.hintTimer);
         this.updateHintUI();
 
-        console.log('Target:', this.targetWord); // For debugging
+        console.log('Target:', this.targetWord);
         this.updateGrid();
         this.resetKeyboard();
     }
@@ -286,7 +292,11 @@ export default class WordGuessGame extends Game {
         this.revealRow(this.currentGuess, guess);
 
         if (guess === this.targetWord) {
-            setTimeout(() => this.gameOver({ score: (6 - this.currentGuess) * 100, won: true }), 1500);
+            // Bonus for solving + remaining guesses
+            const bonus = (6 - this.currentGuess) * 50;
+            this.score += bonus;
+            this.updateScore(this.score);
+            setTimeout(() => this.gameOver({ score: this.score, won: true }), 1500);
         } else {
             this.currentGuess++;
             this.currentInput = '';
@@ -313,6 +323,14 @@ export default class WordGuessGame extends Game {
                 if (char === targetChars[i]) {
                     tile.classList.add('correct');
                     if (key) key.classList.add('correct');
+
+                    // Live Score: 20 points per newly found position
+                    if (!this.solvedIndices.has(i)) {
+                        this.solvedIndices.add(i);
+                        this.score += 20;
+                        this.updateScore(this.score);
+                    }
+
                     targetChars[i] = null; // Mark as handled
                 }
             }, i * 200);
