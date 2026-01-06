@@ -17,7 +17,7 @@
 
 ## 🚀 Live Demo
 
-[Click here to view the live site on Netlify](https://your-site-name.netlify.app) *(Update this link after deployment)*
+[Click here to view the live site on Netlify](https://freegam.netlify.app/) *(Update this link after deployment)*
 
 ## 🛠️ Installation & Local Setup
 
