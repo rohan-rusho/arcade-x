@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Premium Multi-Game Web Platform - Play 20+ Mini Games Instantly.">
+    <title>ArcadeX - Premium Game Hub</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation / Header -->
+        <header class="glass-header">
+            <div class="logo">
+                <i class="fa-solid fa-gamepad"></i>
+                <span>Arcade<span class="highlight">X</span></span>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div class="difficulty-wrapper">
+                    <select id="global-difficulty" class="glass-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Game Hub View -->
+            <section id="game-hub" class="view active">
+                <div class="hero-section">
+                    <h1>Welcome to <span class="gradient-text">ArcadeX</span></h1>
+                    <p>Play 20+ Premium Mini-Games. No Login Required.</p>
+                </div>
+                
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-category="all">All</button>
+                    <button class="tab-btn" data-category="memory">Memory & Word</button>
+                    <button class="tab-btn" data-category="logic">Logic & Puzzle</button>
+                    <button class="tab-btn" data-category="reflex">Reflex & Casual</button>
+                </div>
+
+                <div id="game-grid" class="game-grid">
+                    <!-- Game Cards will be injected here via JS -->
+                </div>
+            </section>
+
+            <!-- Game Instance View -->
+            <section id="game-view" class="view hidden">
+                <div class="game-header">
+                    <button id="back-to-hub" class="icon-btn-text">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+                    <h2 id="current-game-title">Game Title</h2>
+                    <div class="game-stats-display">
+                        <span id="score-display">Score: 0</span>
+                        <span id="best-score-display">Best: 0</span>
+                    </div>
+                </div>
+                
+                <div id="game-container" class="game-container glass-panel">
+                    <!-- Game Canvas/DOM will be injected here -->
+                </div>
+
+                <div class="game-controls-bottom">
+                    <button id="restart-game" class="glass-btn">
+                        <i class="fa-solid fa-rotate-right"></i> Restart
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="glass-footer">
+            <div class="footer-content">
+                <div class="footer-text">
+                    Made with ❤️ by <span class="author-name">Rohan Rusho</span>
+                </div>
+                <div class="social-links">
+                    <a href="https://facebook.com/eita.rohan" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://instagram.com/rohan.rusho" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://github.com/rohan-rusho" target="_blank" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="glass-modal">
+            <h2 id="modal-title">Game Over</h2>
+            <p id="modal-message">Result message here.</p>
+            <div class="modal-actions">
+                <button id="modal-close" class="glass-btn secondary">Close</button>
+                <button id="modal-action" class="glass-btn primary">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
