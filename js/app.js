@@ -310,8 +310,15 @@ async function loadGame(gameMetadata) {
     // Import Game Module dynamically
     try {
         const gamePath = gameMetadata.path;
-        const module = await import(gamePath);
+        // Resolve path relative to this module (app.js)
+        const absolutePath = new URL(gamePath, import.meta.url).href;
+
+        const module = await import(absolutePath);
         const GameClass = module.default;
+
+        if (!GameClass) {
+            throw new Error(`Module ${gamePath} does not have a default export.`);
+        }
 
         state.currentGameInstance = new GameClass(gameMetadata.id, elements.gameContainer, {
             difficulty: state.difficulty
@@ -333,7 +340,7 @@ async function loadGame(gameMetadata) {
 
     } catch (e) {
         console.error('Failed to load game:', e);
-        alert('Error loading game module. Check console.');
+        alert(`Error loading game: ${e.message}`);
     }
 }
 
