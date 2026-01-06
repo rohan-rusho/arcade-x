@@ -357,6 +357,12 @@ async function loadGame(gameMetadata) {
     } catch (e) {
         console.error('Failed to load game:', e);
         alert(`Error loading game: ${e.message}`);
+        showHub(); // Go back if failed
+    } finally {
+        // Hide Loading
+        if (elements.loadingOverlay) {
+            elements.loadingOverlay.classList.remove('active');
+        }
     }
 }
 
