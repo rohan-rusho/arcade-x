@@ -65,6 +65,8 @@ export default class WordGuessGame extends Game {
             </style>
         `;
 
+        this.ui = {}; // Initialize UI object
+
         this.renderGrid();
         this.renderKeyboard();
 
