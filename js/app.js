@@ -346,13 +346,11 @@ async function loadGame(gameMetadata) {
             elements.scoreDisplay.textContent = `Score: ${score}`;
         };
 
-        state.currentGameInstance.onGameOver = (result) => {
-            handleGameOver(result);
-        };
+        state.currentGameInstance = gameInstance;
+        elements.scoreDisplay.textContent = 'Score: 0';
+        elements.bestScoreDisplay.textContent = `Best: ${Storage.getHighScore(gameMetadata.id)}`;
 
-        state.currentGameInstance.init();
-        state.currentGameInstance.start();
-
+        gameInstance.start();
         showGameView();
         Storage.setLastPlayed(gameMetadata.id);
 
