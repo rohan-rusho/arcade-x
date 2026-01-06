@@ -26,6 +26,7 @@ const elements = {
     themeToggle: document.getElementById('theme-toggle'),
     difficultySelect: document.getElementById('global-difficulty'),
     categoryTabs: document.querySelectorAll('.tab-btn'),
+    logo: document.querySelector('.logo'),
     modal: {
         overlay: document.getElementById('modal-overlay'),
         title: document.getElementById('modal-title'),
@@ -203,6 +204,12 @@ function init() {
  * Setup Global Event Listeners
  */
 function setupEventListeners() {
+    // Logo Click (Home)
+    elements.logo.style.cursor = 'pointer';
+    elements.logo.addEventListener('click', () => {
+        showHub();
+    });
+
     // Theme Toggle
     elements.themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light-theme');
