@@ -33,7 +33,8 @@ const elements = {
         message: document.getElementById('modal-message'),
         closeBtn: document.getElementById('modal-close'),
         actionBtn: document.getElementById('modal-action')
-    }
+    },
+    loadingOverlay: document.getElementById('loading-overlay')
 };
 
 // Game Registry (Will act as a manifest)
@@ -305,19 +306,27 @@ function renderGameGrid(category) {
  */
 async function loadGame(gameMetadata) {
     if (state.currentGameInstance) {
+        state.currentGameInstance.stop();
         state.currentGameInstance.destroy();
         state.currentGameInstance = null;
     }
 
     state.currentGame = gameMetadata;
-    elements.gameTitle.textContent = gameMetadata.title;
-    elements.scoreDisplay.textContent = 'Score: 0';
-    elements.bestScoreDisplay.textContent = `Best: ${Storage.getHighScore(gameMetadata.id)}`;
+    elements.gameTitle.innerHTML = `<i class="fa-solid ${gameMetadata.icon}"></i> ${gameMetadata.title}`;
 
-    // Import Game Module dynamically
+    // Show Loading
+    if (elements.loadingOverlay) {
+        elements.loadingOverlay.classList.add('active');
+        await new Promise(resolve => setTimeout(resolve, 800)); // Cute delay
+    }
+
+    // Hide Hub, Show Game View (hidden initially to prevent flash)
+    elements.gameHub.classList.add('hidden');
+    elements.gameView.classList.remove('hidden');
+
     try {
         const gamePath = gameMetadata.path;
-        // Resolve path relative to this module (app.js)
+        // Resolve path relative to this module
         const absolutePath = new URL(gamePath, import.meta.url).href;
 
         const module = await import(absolutePath);
@@ -327,11 +336,13 @@ async function loadGame(gameMetadata) {
             throw new Error(`Module ${gamePath} does not have a default export.`);
         }
 
-        state.currentGameInstance = new GameClass(gameMetadata.id, elements.gameContainer, {
+        const gameInstance = new GameClass(gameMetadata.id, elements.gameContainer, {
             difficulty: state.difficulty
         });
 
-        state.currentGameInstance.onScoreUpdate = (score) => {
+        gameInstance.init();
+        gameInstance.onGameOver = handleGameOver;
+        gameInstance.onScoreUpdate = (score) => {
             elements.scoreDisplay.textContent = `Score: ${score}`;
         };
 

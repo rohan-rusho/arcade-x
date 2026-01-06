@@ -123,6 +123,7 @@ export default class Connect4Game extends Game {
     }
 
     handleDrop(col) {
+        console.log('Connect4 Clicked Col:', col, 'Active:', this.gameActive, 'Player:', this.currentPlayer);
         if (!this.gameActive || this.currentPlayer !== 1) return;
 
         if (this.dropPiece(col, 1)) {

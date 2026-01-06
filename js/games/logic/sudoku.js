@@ -76,27 +76,7 @@ export default class SudokuGame extends Game {
         this.renderBoard();
     }
 
-    generateBoard() {
-        // Simple Generator
-        // 1. Fill diagonal 3x3 boxes (independent)
-        this.board = Array(81).fill(0);
-        this.fillDiagonal();
-        // 2. Solve to fill rest
-        this.solveSudoku(this.board);
 
-        // 3. Remove digits
-        this.displayBoard = [...this.board];
-        let attempts = this.config.difficulty === 'easy' ? 30 : this.config.difficulty === 'medium' ? 45 : 55;
-        while (attempts > 0) {
-            let row = Math.floor(Math.random() * 9);
-            let col = Math.floor(Math.random() * 9);
-            let idx = row * 9 + col;
-            if (this.displayBoard[idx] !== 0) {
-                this.displayBoard[idx] = 0;
-                attempts--;
-            }
-        }
-    }
 
     fillDiagonal() {
         for (let i = 0; i < 9; i += 3) {
@@ -226,29 +206,30 @@ export default class SudokuGame extends Game {
 
     // Override generation to save mask
     generateBoard() {
-        super.generateBoard(); // Calling the method defined above? No, this IS the class.
-        // Wait, I am inside class.
-        // Copy-paste logic from above or refactor.
-        // Refactor:
         this.board = Array(81).fill(0);
         this.fillDiagonal();
         this.solveSudoku(this.board);
+
+        // Store Full Solution
+        // this.board is now full
+
+        // Create Display Board with holes
         this.displayBoard = [...this.board];
 
-        // Remove
-        let attempts = this.config.difficulty === 'easy' ? 30 : 50;
+        let attempts = this.config.difficulty === 'easy' ? 30 : this.config.difficulty === 'medium' ? 45 : 55;
         this.initialIndices = new Set();
 
-        // ... Logic to remove ...
         while (attempts > 0) {
-            let idx = Math.floor(Math.random() * 81);
+            let row = Math.floor(Math.random() * 9);
+            let col = Math.floor(Math.random() * 9);
+            let idx = row * 9 + col;
             if (this.displayBoard[idx] !== 0) {
                 this.displayBoard[idx] = 0;
                 attempts--;
             }
         }
 
-        // Save indices
+        // Save indices of initial numbers
         this.displayBoard.forEach((v, i) => {
             if (v !== 0) this.initialIndices.add(i);
         });

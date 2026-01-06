@@ -469,12 +469,152 @@ main {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    .app-container {
+        padding-bottom: var(--footer-height);
+        /* Ensure footer doesn't overlap content */
+    }
+
+    .hero-section {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
     .hero-section h1 {
         font-size: 2rem;
     }
 
+    .glass-header {
+        padding: 0 1rem;
+        height: 60px;
+    }
+
+    .logo span {
+        font-size: 1.2rem;
+    }
+
+    /* Stack footer content */
     .footer-content {
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.5rem;
+        text-align: center;
     }
+
+    /* Grid: 1 column on mobile */
+    .game-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+
+    .game-card {
+        padding: 1rem;
+        /* Smaller padding */
+    }
+
+    /* Game View Fixes */
+    main {
+        padding: 1rem;
+        /* Reduce main padding */
+    }
+
+    .game-container {
+        min-height: 400px;
+        /* Reduce height requirement */
+        padding: 10px;
+        /* Prevent edge collision */
+        overflow: hidden;
+        /* Prevent inner game overflow */
+    }
+
+    /* Ensure games fit (max-width for games like 2048) */
+    .game-area,
+    .c4-board-wrapper,
+    .sudoku-grid {
+        transform: scale(0.85);
+        /* Slight shrink for complex games */
+        transform-origin: center center;
+    }
+}
+
+@media (max-width: 400px) {
+
+    /* Even smaller screens */
+    .game-area,
+    .c4-board-wrapper,
+    .sudoku-grid {
+        transform: scale(0.75);
+    }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.loading-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.jumping-dots {
+    display: flex;
+    gap: 12px;
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: jump 0.6s ease-in-out infinite alternate;
+}
+
+.dot:nth-child(1) {
+    animation-delay: 0s;
+    background: var(--accent);
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.2s;
+    background: var(--secondary);
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.4s;
+    background: var(--success);
+}
+
+@keyframes jump {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        transform: translateY(-25px) scale(1.2);
+    }
+}
+
+.loader-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
