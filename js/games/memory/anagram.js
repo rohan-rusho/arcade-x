@@ -30,6 +30,12 @@ export default class AnagramGame extends Game {
                     <button id="ag-submit" class="glass-btn primary">Submit</button>
                     <button id="ag-skip" class="glass-btn secondary">Skip (-10)</button>
                 </div>
+                
+                <div style="width: 100%; display: flex; justify-content: center;">
+                    <button id="ag-hint" class="glass-btn primary" style="min-width: 120px;">
+                        <i class="fa-solid fa-lightbulb"></i> Hint
+                    </button>
+                </div>
 
                 <div id="ag-feedback" class="ag-feedback"></div>
             </div>
@@ -61,6 +67,7 @@ export default class AnagramGame extends Game {
             input: this.container.querySelector('#ag-input'),
             submit: this.container.querySelector('#ag-submit'),
             skip: this.container.querySelector('#ag-skip'),
+            hint: this.container.querySelector('#ag-hint'),
             time: this.container.querySelector('#ag-time'),
             score: this.container.querySelector('#ag-score'),
             feedback: this.container.querySelector('#ag-feedback')
@@ -68,15 +75,25 @@ export default class AnagramGame extends Game {
 
         this.ui.submit.addEventListener('click', () => this.checkAnswer());
         this.ui.skip.addEventListener('click', () => this.skipWord());
+        this.ui.hint.addEventListener('click', () => this.useHint());
         this.ui.input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.checkAnswer();
         });
+    }
+
+    destroy() {
+        if (this.hintTimer) clearInterval(this.hintTimer);
+        super.destroy();
     }
 
     start() {
         super.start();
         this.score = 0;
         this.timeLeft = 60;
+        this.hintAvailable = true;
+        this.hintCooldown = 0;
+        this.updateHintUI();
+
         this.updateScore(0);
         this.nextWord();
         this.startTimer();
@@ -85,6 +102,7 @@ export default class AnagramGame extends Game {
     stop() {
         super.stop();
         clearInterval(this.timer);
+        if (this.hintTimer) clearInterval(this.hintTimer);
     }
 
     startTimer() {
@@ -98,14 +116,53 @@ export default class AnagramGame extends Game {
         }, 1000);
     }
 
+    useHint() {
+        if (!this.isPlaying || !this.hintAvailable) return;
+
+        // Reveal the first letter?
+        const firstLetter = this.currentWord[0];
+        this.showFeedback(`Hint: Starts with ${firstLetter}`, 'warning');
+
+        // Cooldown
+        this.startHintCooldown();
+    }
+
+    startHintCooldown() {
+        this.hintAvailable = false;
+        this.hintCooldown = 40;
+        this.updateHintUI();
+
+        this.hintTimer = setInterval(() => {
+            this.hintCooldown--;
+            this.updateHintUI();
+            if (this.hintCooldown <= 0) {
+                this.hintAvailable = true;
+                clearInterval(this.hintTimer);
+                this.updateHintUI();
+            }
+        }, 1000);
+    }
+
+    updateHintUI() {
+        if (!this.ui.hint) return;
+        if (this.hintAvailable) {
+            this.ui.hint.disabled = false;
+            this.ui.hint.innerHTML = `<i class="fa-solid fa-lightbulb"></i> Hint`;
+            this.ui.hint.style.opacity = '1';
+        } else {
+            this.ui.hint.disabled = true;
+            this.ui.hint.innerHTML = `<i class="fa-solid fa-hourglass"></i> ${this.hintCooldown}s`;
+            this.ui.hint.style.opacity = '0.5';
+        }
+    }
+
     nextWord() {
-        const difficulty = this.config.difficulty; // easy, medium, hard
+        const difficulty = this.config.difficulty;
         const list = this.words[difficulty] || this.words.medium;
 
         this.currentWord = list[Math.floor(Math.random() * list.length)];
         this.scrambledWord = this.shuffle(this.currentWord);
 
-        // Ensure it's not same as original
         while (this.scrambledWord === this.currentWord) {
             this.scrambledWord = this.shuffle(this.currentWord);
         }
@@ -145,6 +202,11 @@ export default class AnagramGame extends Game {
     showFeedback(msg, type) {
         this.ui.feedback.textContent = msg;
         this.ui.feedback.style.color = `var(--${type})`;
-        setTimeout(() => this.ui.feedback.textContent = '', 1000);
+        // Don't auto clear if hint? 
+        if (type !== 'warning' || !msg.includes('Hint')) {
+            setTimeout(() => this.ui.feedback.textContent = '', 1000);
+        } else {
+            setTimeout(() => this.ui.feedback.textContent = '', 3000);
+        }
     }
 }

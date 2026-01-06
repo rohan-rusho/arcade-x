@@ -56,6 +56,10 @@ export default class WordGuessGame extends Game {
                 .wg-key.present { background: var(--warning, #f59e0b); }
                 .wg-key.absent { opacity: 0.3; }
 
+                .wg-hint-area { width: 100%; display: flex; justify-content: center; margin-top: 10px; }
+                .hint-btn { min-width: 120px; }
+                .hint-cd { font-size: 0.8rem; opacity: 0.7; margin-left: 5px; }
+
                 @keyframes pulse { 50% { transform: scale(1.1); } }
                 @keyframes flip { 0% { transform: rotateX(0); } 100% { transform: rotateX(360deg); } }
             </style>
@@ -64,6 +68,15 @@ export default class WordGuessGame extends Game {
         this.renderGrid();
         this.renderKeyboard();
 
+        // Hint Button
+        const hintArea = document.createElement('div');
+        hintArea.className = 'wg-hint-area';
+        hintArea.innerHTML = `<button id="wg-hint" class="glass-btn primary hint-btn"><i class="fa-solid fa-lightbulb"></i> Hint</button>`;
+        this.container.querySelector('.wg-keyboard').after(hintArea); // Place after keyboard
+
+        this.ui.hintBtn = hintArea.querySelector('#wg-hint');
+        this.ui.hintBtn.onclick = () => this.useHint();
+
         // Physical Keyboard Support
         this.handleKeydown = this.handleKeydown.bind(this);
         document.addEventListener('keydown', this.handleKeydown);
@@ -71,6 +84,7 @@ export default class WordGuessGame extends Game {
 
     destroy() {
         document.removeEventListener('keydown', this.handleKeydown);
+        if (this.hintTimer) clearInterval(this.hintTimer);
         super.destroy();
     }
 
@@ -80,9 +94,84 @@ export default class WordGuessGame extends Game {
         this.currentInput = '';
         this.guesses = Array(6).fill('');
         this.targetWord = this.WORDS[Math.floor(Math.random() * this.WORDS.length)];
+        this.hintAvailable = true;
+        this.hintCooldown = 0;
+        if (this.hintTimer) clearInterval(this.hintTimer);
+        this.updateHintUI();
+
         console.log('Target:', this.targetWord); // For debugging
         this.updateGrid();
         this.resetKeyboard();
+    }
+
+    useHint() {
+        if (!this.isPlaying || !this.hintAvailable) return;
+
+        // Reveal logic: Find first unrevealed letter in current row correct position
+        // Actually, we can't fill the current row because that's user input.
+        // We should "Flash" the correct letter or show a message? 
+        // Better: Fill a correct letter into the current input if empty?
+        // Or: Show a notification "The 3rd letter is X".
+
+        // Let's go with: Reveal one letter in correct position that hasn't been guessed correctly yet?
+        // Simpler: Just reveal a random un-guessed letter position.
+
+        const targetChars = this.targetWord.split('');
+        const unrevealedIndices = [];
+
+        // Check which indices the user hasn't got green yet (in previous guesses)
+        // But we don't track "locked" greens. 
+        // Let's just pick a random index 0-4.
+        for (let i = 0; i < 5; i++) {
+            unrevealedIndices.push(i);
+        }
+
+        const idx = unrevealedIndices[Math.floor(Math.random() * unrevealedIndices.length)];
+        const char = targetChars[idx];
+
+        // Visual feedback
+        const msg = `Hint: The letter at pos ${idx + 1} is ${char}`;
+        const messageEl = this.container.querySelector('#wg-message');
+        if (!messageEl) {
+            const m = document.createElement('div');
+            m.id = 'wg-message';
+            this.container.appendChild(m);
+        }
+        document.getElementById('wg-message').textContent = msg;
+        document.getElementById('wg-message').style.color = 'var(--accent)';
+        setTimeout(() => document.getElementById('wg-message').textContent = '', 4000);
+
+        // Start Cooldown
+        this.startHintCooldown();
+    }
+
+    startHintCooldown() {
+        this.hintAvailable = false;
+        this.hintCooldown = 40;
+        this.updateHintUI();
+
+        this.hintTimer = setInterval(() => {
+            this.hintCooldown--;
+            this.updateHintUI();
+            if (this.hintCooldown <= 0) {
+                this.hintAvailable = true;
+                clearInterval(this.hintTimer);
+                this.updateHintUI();
+            }
+        }, 1000);
+    }
+
+    updateHintUI() {
+        if (!this.ui.hintBtn) return;
+        if (this.hintAvailable) {
+            this.ui.hintBtn.disabled = false;
+            this.ui.hintBtn.innerHTML = `<i class="fa-solid fa-lightbulb"></i> Hint`;
+            this.ui.hintBtn.style.opacity = '1';
+        } else {
+            this.ui.hintBtn.disabled = true;
+            this.ui.hintBtn.innerHTML = `<i class="fa-solid fa-hourglass"></i> ${this.hintCooldown}s`;
+            this.ui.hintBtn.style.opacity = '0.5';
+        }
     }
 
     renderGrid() {
