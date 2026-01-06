@@ -351,7 +351,13 @@ function handleGameOver(result) {
     const isHighScore = Storage.saveHighScore(state.currentGame.id, result.score);
 
     elements.modal.title.textContent = result.won ? 'You Won!' : 'Game Over';
-    elements.modal.message.textContent = `Score: ${result.score}` + (isHighScore ? ' (New High Score!)' : '');
+
+    let message = `Score: ${result.score}` + (isHighScore ? ' (New High Score!)' : '');
+    if (result.message) {
+        message += `<br><br><span style="color: var(--accent); font-size: 0.9em;">${result.message}</span>`;
+    }
+
+    elements.modal.message.innerHTML = message; // Use innerHTML for styling
 
     showModal();
 }

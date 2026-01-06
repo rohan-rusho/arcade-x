@@ -289,7 +289,11 @@ export default class WordGuessGame extends Game {
             this.currentGuess++;
             this.currentInput = '';
             if (this.currentGuess >= this.maxGuesses) {
-                setTimeout(() => this.gameOver({ score: 0, won: false }), 1500);
+                setTimeout(() => this.gameOver({
+                    score: 0,
+                    won: false,
+                    message: `The word was: <b>${this.targetWord}</b>`
+                }), 1500);
             }
         }
     }
