@@ -351,6 +351,11 @@ async function loadGame(gameMetadata) {
         elements.bestScoreDisplay.textContent = `Best: ${Storage.getHighScore(gameMetadata.id)}`;
 
         gameInstance.start();
+
+        if (elements.loadingOverlay) {
+            elements.loadingOverlay.classList.remove('active');
+        }
+
         showGameView();
         Storage.setLastPlayed(gameMetadata.id);
 
